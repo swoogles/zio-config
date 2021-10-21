@@ -70,7 +70,7 @@ object MultipleSourcesComplexExample extends zio.App {
         descriptor[KafkaApplication.KafkaConfig]
       )
 
-    pgm.flatMap(r => zio.console.putStrLn(r.toString)).exitCode
+    pgm.flatMap(r => zio.Console.printLine(r.toString)).exitCode
     // KafkaConfig(bootstrap:commandline,schemaregistry:system_env,from hocon source)
   }
 }

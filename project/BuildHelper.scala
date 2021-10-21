@@ -23,7 +23,7 @@ object BuildHelper {
   val Scala211: String   = versions("2.11")
   val Scala212: String   = versions("2.12")
   val Scala213: String   = versions("2.13")
-  val ScalaDotty: String = versions("3.0")
+  val ScalaDotty: String = versions("3.1")
 
   val SilencerVersion = "1.7.6"
 
@@ -32,7 +32,8 @@ object BuildHelper {
     "-encoding",
     "UTF-8",
     "-feature",
-    "-unchecked"
+    "-unchecked",
+    "-P:semanticdb:exclude:Macros",
   ) ++ {
     if (sys.env.contains("CI")) {
       Seq("-Xfatal-warnings")
@@ -48,7 +49,8 @@ object BuildHelper {
     "-Yrangepos",
     "-Xlint:_,-missing-interpolator,-type-parameter-shadow",
     "-Ywarn-numeric-widen",
-    "-Ywarn-value-discard"
+    "-Ywarn-value-discard",
+    "-P:semanticdb:exclude:Macros",
   )
 
   private def optimizerOptions(optimize: Boolean) =
@@ -240,7 +242,7 @@ object BuildHelper {
           compilerPlugin("org.typelevel"  %% "kind-projector"  % "0.13.1" cross CrossVersion.full)
         )
     },
-    semanticdbEnabled := scalaVersion.value != ScalaDotty, // enable SemanticDB
+    semanticdbEnabled := true, // enable SemanticDB
     semanticdbOptions += "-P:semanticdb:synthetics:on",
     semanticdbVersion := scalafixSemanticdb.revision, // use Scalafix compatible version
     ThisBuild / scalafixScalaBinaryVersion := CrossVersion.binaryScalaVersion(scalaVersion.value),

@@ -1,11 +1,11 @@
 package zio.config
 
-import zio.system.System
 import zio.{Has, Layer, Tag, ZIO, ZLayer}
 
 import java.time.{Instant, LocalDate, LocalDateTime, LocalTime}
 import java.util.{Properties, UUID}
 import scala.concurrent.duration.Duration
+import zio.System
 
 trait ConfigStringModule extends ConfigModule with ConfigSourceStringModule {
 
@@ -428,7 +428,7 @@ trait ConfigStringModule extends ConfigModule with ConfigSourceStringModule {
      */
     def uuid(path: String): ConfigDescriptor[UUID] = nested(path)(uuid)
 
-    val zioDuration: ConfigDescriptor[zio.duration.Duration] =
+    val zioDuration: ConfigDescriptor[zio.Duration] =
       sourceDesc(ConfigSource.empty, PropertyType.ZioDurationType) ?? "value of type duration"
 
     /**
@@ -448,7 +448,7 @@ trait ConfigStringModule extends ConfigModule with ConfigSourceStringModule {
      *
      * }}}
      */
-    def zioDuration(path: String): ConfigDescriptor[zio.duration.Duration] = nested(path)(zioDuration)
+    def zioDuration(path: String): ConfigDescriptor[zio.Duration] = nested(path)(zioDuration)
 
   }
 
@@ -738,7 +738,7 @@ trait ConfigStringModule extends ConfigModule with ConfigSourceStringModule {
       valueDelimiter: Option[Char] = None,
       leafForSequence: LeafForSequence = LeafForSequence.Valid,
       filterKeys: String => Boolean = _ => true
-    )(implicit tag: Tag[A]): ZLayer[System, ReadError[String], Has[A]] =
+    )(implicit tag: Tag[A]): ZLayer[Has[System], ReadError[String], Has[A]] =
       fromConfigDescriptorM(
         ConfigSource
           .fromSystemEnv(keyDelimiter, valueDelimiter, leafForSequence, filterKeys)
@@ -772,7 +772,7 @@ trait ConfigStringModule extends ConfigModule with ConfigSourceStringModule {
       valueDelimiter: Option[Char] = None,
       leafForSequence: LeafForSequence = LeafForSequence.Valid,
       filterKeys: String => Boolean = _ => true
-    )(implicit tag: Tag[A]): ZLayer[System, ReadError[String], Has[A]] =
+    )(implicit tag: Tag[A]): ZLayer[Has[System], ReadError[String], Has[A]] =
       fromConfigDescriptorM(
         ConfigSource
           .fromSystemProps(keyDelimiter, valueDelimiter, leafForSequence, filterKeys)

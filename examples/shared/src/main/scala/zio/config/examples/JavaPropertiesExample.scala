@@ -1,12 +1,12 @@
 package zio.config.examples
 
 import zio.config._
-import zio.console.Console
 import zio.{App, ExitCode, Has, ZEnv, ZIO, ZLayer, console}
 
 import java.io.IOException
 
 import ConfigDescriptor._
+import zio.{ Console, Console }
 
 /**
  * An example of an entire application that uses java properties
@@ -30,12 +30,12 @@ object JavaPropertiesExample extends App {
       ZConfig.fromProperties(properties, ApplicationConfig.configuration, "constant")
 
     val pgm =
-      SimpleExample.finalExecution.provideLayer(configLayer ++ ZLayer.requires[Console])
+      SimpleExample.finalExecution.provideLayer(configLayer ++ ZLayer.requires[Has[Console]])
 
     pgm
-      .foldM(
-        throwable => console.putStr(throwable.getMessage),
-        _ => console.putStrLn("hurray !! Application ran successfully..")
+      .foldZIO(
+        throwable => Console.print(throwable.getMessage),
+        _ => Console.printLine("hurray !! Application ran successfully..")
       )
       .exitCode
   }
@@ -44,17 +44,17 @@ object JavaPropertiesExample extends App {
 // The core application functions
 object SimpleExample {
 
-  val printConfigs: ZIO[Has[ApplicationConfig] with Console, IOException, Unit] =
+  val printConfigs: ZIO[Has[ApplicationConfig] with Has[Console], IOException, Unit] =
     for {
       appConfig <- getConfig[ApplicationConfig]
-      _         <- console.putStrLn(appConfig.bridgeIp)
-      _         <- console.putStrLn(appConfig.userName)
+      _         <- Console.printLine(appConfig.bridgeIp)
+      _         <- Console.printLine(appConfig.userName)
     } yield ()
 
-  val finalExecution: ZIO[Has[ApplicationConfig] with Console, IOException, Unit] =
+  val finalExecution: ZIO[Has[ApplicationConfig] with Has[Console], IOException, Unit] =
     for {
       _ <- printConfigs
-      _ <- console.putStrLn(s"processing data......")
+      _ <- Console.printLine(s"processing data......")
     } yield ()
 }
 // A note that, with magnolia module (which is still experimental), you can skip writing the {{ configuration }} in ApplicationConfig object

@@ -9,7 +9,7 @@ object SyntaxTest extends BaseSpec {
 
   val spec: ZSpec[Environment, Failure] =
     suite("SyntaxTest")(
-      testM("config.narrow") {
+      test("config.narrow") {
         case class Cfg(a: String, b: Int)
         val cfg = ZLayer.succeed(Cfg("a", 1))
         val a   = ZIO.access[Has[String]](_.get)

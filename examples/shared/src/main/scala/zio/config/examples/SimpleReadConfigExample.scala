@@ -1,10 +1,12 @@
 package zio.config.examples
 
 import zio.config._
-import zio.console._
+
 import zio.{App, ExitCode, Has, URIO, ZEnv, ZIO}
 
 import ConfigDescriptor._
+import zio.Console
+import zio.Console._
 
 final case class Prod(ldap: String, port: Int, dburl: Option[String])
 
@@ -23,7 +25,7 @@ object ReadConfig extends App {
 
   override def run(args: List[String]): URIO[ZEnv, ExitCode] =
     for {
-      console    <- ZIO.environment[Console].map(_.get)
+      console    <- ZIO.environment[Has[Console]].map(_.get)
       configLayer = ZConfig.fromMap(
                       Map("LDAP" -> "ldap", "PORT" -> "1999", "DB_URL" -> "ddd"),
                       Prod.prodConfig,
@@ -31,7 +33,7 @@ object ReadConfig extends App {
                     )
       out        <- Prod.myAppLogic
                       .provideLayer(configLayer)
-                      .foldM(
+                      .foldZIO(
                         failure => console.putStrLn(failure.toString),
                         _ => console.putStrLn("Success")
                       )
